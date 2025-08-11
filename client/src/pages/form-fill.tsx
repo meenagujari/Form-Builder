@@ -198,12 +198,22 @@ export default function FormFill() {
   };
 
   const renderClozeQuestion = (question: ClozeQuestion) => {
-    const [blankAnswers, setBlankAnswers] = useState<Record<string, string>>({});
+    // Initialize blank answers for this question if not exists
+    if (!answers[question.id]) {
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: {}
+      }));
+    }
+
+    const blankAnswers = answers[question.id] || {};
 
     const updateBlankAnswer = (blankId: string, value: string) => {
       const newAnswers = { ...blankAnswers, [blankId]: value };
-      setBlankAnswers(newAnswers);
-      updateAnswer(question.id, newAnswers);
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: newAnswers
+      }));
     };
 
     // Parse text with blanks
@@ -278,12 +288,22 @@ export default function FormFill() {
   };
 
   const renderComprehensionQuestion = (question: ComprehensionQuestion) => {
-    const [mcqAnswers, setMcqAnswers] = useState<Record<string, string>>({});
+    // Initialize MCQ answers for this question if not exists
+    if (!answers[question.id]) {
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: {}
+      }));
+    }
+
+    const mcqAnswers = answers[question.id] || {};
 
     const updateMcqAnswer = (mcqId: string, optionId: string) => {
       const newAnswers = { ...mcqAnswers, [mcqId]: optionId };
-      setMcqAnswers(newAnswers);
-      updateAnswer(question.id, newAnswers);
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: newAnswers
+      }));
     };
 
     return (
