@@ -5,6 +5,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Form, Question } from "@shared/schema";
 import { FormHeader } from "@/components/FormHeader";
@@ -272,6 +273,34 @@ export default function FormBuilder() {
         {/* Enhanced Sidebar */}
         <aside className="w-80 border-r border-gray-200/50 glass-effect min-h-screen">
           <div className="p-6">
+            {/* Form Settings Section */}
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">Form Settings</h2>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-sm font-medium text-gray-700">Form Title</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Enter form title"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
+                  <textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Enter form description"
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">Question Types</h2>
               <p className="text-sm text-gray-600">Drag or click to add questions to your form</p>
@@ -330,32 +359,7 @@ export default function FormBuilder() {
               </div>
             </div>
 
-            {/* Form Settings */}
-            <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-              <h3 className="font-medium text-gray-900 mb-3 flex items-center">
-                <Settings size={16} className="mr-2" />
-                Form Settings
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="Form title"
-                    className="text-sm"
-                  />
-                </div>
-                <div>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Form description"
-                    className="text-sm resize-none"
-                    rows={2}
-                  />
-                </div>
-              </div>
-            </div>
+
           </div>
         </aside>
 
