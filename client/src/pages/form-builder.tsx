@@ -404,16 +404,16 @@ export default function FormBuilder() {
             <div className="mb-8">
               <div className="question-card">
                 <div className="text-center">
-                  {formData.headerImage && (
-                    <div className="w-full h-32 gradient-bg rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 bg-black/20"></div>
-                      <h1 className="text-2xl font-bold text-white z-10">{formData.title}</h1>
+                  {formData.headerImage ? (
+                    <div className="w-full h-32 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden" style={{ backgroundImage: `url(${formData.headerImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                      <div className="absolute inset-0 bg-black/40"></div>
+                      <h1 className="text-2xl font-bold text-white z-10">{formData.title || "Untitled Form"}</h1>
                     </div>
+                  ) : (
+                    <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                      {formData.title || "Untitled Form"}
+                    </h1>
                   )}
-                  
-                  <h1 className="text-3xl font-bold text-gray-900 mb-3">
-                    {formData.title || "Untitled Form"}
-                  </h1>
                   {formData.description && (
                     <p className="text-lg text-gray-600 mb-4">{formData.description}</p>
                   )}
