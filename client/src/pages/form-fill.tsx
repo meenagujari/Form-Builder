@@ -47,7 +47,7 @@ function DraggableItem({ id, children }: DraggableItemProps) {
   );
 }
 
-function DraggableBlankItem({ id, children }: DraggableItemProps) {
+function DraggableAnswerOption({ id, children }: DraggableItemProps) {
   const {
     attributes,
     listeners,
@@ -250,14 +250,15 @@ export default function FormFill() {
       }));
     };
 
-    // Parse text with blanks
+    // Parse text with blanks as drop zones
     const renderTextWithBlanks = () => {
       let text = question.text;
       const sortedBlanks = [...question.blanks].sort((a, b) => b.position - a.position);
       
       sortedBlanks.forEach(blank => {
-        const blankInput = `<input id="${blank.id}" data-blank="${blank.id}" class="inline-input" placeholder="____" />`;
-        text = text.substring(0, blank.position) + blankInput + text.substring(blank.position + blank.word.length);
+        const answer = blankAnswers[blank.id] || '';
+        const dropZone = `<span id="${blank.id}" data-blank="${blank.id}" class="inline-drop-zone ${answer ? 'filled' : ''}">${answer || '____'}</span>`;
+        text = text.substring(0, blank.position) + dropZone + text.substring(blank.position + blank.word.length);
       });
 
       return text;
@@ -277,76 +278,76 @@ export default function FormFill() {
           />
           
           <style dangerouslySetInnerHTML={{ __html: `
-            .inline-input {
+            .inline-drop-zone {
               border-bottom: 2px solid #6366f1;
-              background: transparent;
-              outline: none;
+              background: rgba(99, 102, 241, 0.1);
               padding: 2px 8px;
               margin: 0 4px;
               min-width: 60px;
               font-weight: 500;
+              border-radius: 4px;
+              display: inline-block;
+              min-height: 24px;
+              vertical-align: middle;
+              cursor: pointer;
+              transition: all 0.2s;
             }
-            .inline-input:focus {
+            .inline-drop-zone:hover {
+              background: rgba(99, 102, 241, 0.2);
               border-bottom-color: #4f46e5;
+            }
+            .inline-drop-zone.filled {
+              background: rgba(34, 197, 94, 0.1);
+              border-bottom-color: #22c55e;
+              color: #15803d;
             }
           ` }} />
 
-          <script dangerouslySetInnerHTML={{
-            __html: `
-              document.querySelectorAll('[data-blank]').forEach(input => {
-                input.addEventListener('input', (e) => {
-                  const blankId = e.target.dataset.blank;
-                  const value = e.target.value;
-                  // This would need to be connected to React state in a real implementation
-                });
-              });
-            `
-          }} />
-
           <div className="mt-6">
-            <h4 className="font-medium mb-3">Fill in the blanks (drag to reorder):</h4>
-            <DndContext collisionDetection={closestCenter} onDragEnd={(event) => {
-              const { active, over } = event;
-              if (!over || active.id === over.id) return;
+            <h4 className="font-medium mb-3">Drag the correct answers to the blanks:</h4>
+            
+            <DndContext 
+              collisionDetection={closestCenter} 
+              onDragEnd={(event) => {
+                const { active, over } = event;
+                if (!over) return;
 
-              // Find the old and new indices
-              const activeId = active.id as string;
-              const overId = over.id as string;
-              
-              const activeIndex = question.blanks.findIndex(b => `blank-input-${b.id}` === activeId);
-              const overIndex = question.blanks.findIndex(b => `blank-input-${b.id}` === overId);
-              
-              if (activeIndex !== -1 && overIndex !== -1) {
-                // Create new order for display (this affects visual order of answer inputs)
-                console.log(`Reordering blank from position ${activeIndex + 1} to position ${overIndex + 1}`);
-                // Note: This reorders the visual display of answer inputs, not the text blanks themselves
-              }
-            }}>
-              <SortableContext items={question.blanks.map(b => `blank-input-${b.id}`)} strategy={verticalListSortingStrategy}>
-                <div className="space-y-3">
-                  {question.blanks.map((blank, index) => {
-                    const sortableId = `blank-input-${blank.id}`;
-                    return (
-                      <DraggableBlankItem key={blank.id} id={sortableId}>
-                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary transition-colors cursor-move">
-                          <GripVertical size={16} className="text-gray-400" />
-                          <Label className="min-w-0 flex-shrink-0">Blank {index + 1}:</Label>
-                          <Input
-                            value={blankAnswers[blank.id] || ""}
-                            onChange={(e) => updateBlankAnswer(blank.id, e.target.value)}
-                            className="flex-1"
-                            placeholder={`Enter answer for "${blank.word}"`}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <span className="text-sm text-gray-500 min-w-0 flex-shrink-0">
-                            Original: "{blank.word}"
-                          </span>
+                const activeId = active.id as string;
+                const overId = over.id as string;
+                
+                // Check if dropping on a blank space
+                const targetBlank = question.blanks.find(b => b.id === overId);
+                if (targetBlank && activeId.startsWith('answer-option-')) {
+                  const answerText = activeId.replace('answer-option-', '');
+                  updateBlankAnswer(targetBlank.id, answerText);
+                }
+              }}
+            >
+              {/* Answer Options to Drag */}
+              <div className="mb-4">
+                <h5 className="text-sm font-medium text-gray-700 mb-2">Answer Options:</h5>
+                <div className="flex flex-wrap gap-2">
+                  <SortableContext items={question.blanks.map(b => `answer-option-${b.word}`)} strategy={verticalListSortingStrategy}>
+                    {question.blanks.map(blank => (
+                      <DraggableAnswerOption key={`answer-option-${blank.word}`} id={`answer-option-${blank.word}`}>
+                        <div className="px-3 py-2 bg-blue-100 border border-blue-300 rounded-lg cursor-move hover:bg-blue-200 transition-colors">
+                          <span className="text-blue-800 font-medium">{blank.word}</span>
                         </div>
-                      </DraggableBlankItem>
-                    );
-                  })}
+                      </DraggableAnswerOption>
+                    ))}
+                  </SortableContext>
                 </div>
-              </SortableContext>
+              </div>
+
+              {/* Drop Zones for Blanks */}
+              <div className="text-base leading-relaxed">
+                <SortableContext items={question.blanks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                  <div 
+                    className="text-base leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: renderTextWithBlanks() }}
+                  />
+                </SortableContext>
+              </div>
             </DndContext>
           </div>
         </CardContent>
