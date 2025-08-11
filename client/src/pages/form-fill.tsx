@@ -91,14 +91,27 @@ export default function FormFill() {
   };
 
   const renderCategorizeQuestion = (question: CategorizeQuestion) => {
-    const [categorizedItems, setCategorizedItems] = useState<Record<string, string[]>>(() => {
+    // Initialize categorized items for this question if not exists
+    if (!answers[question.id]) {
       const initial: Record<string, string[]> = {};
       question.categories.forEach(cat => {
         initial[cat.id] = [];
       });
       initial["uncategorized"] = question.items.map(item => item.id);
-      return initial;
-    });
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: initial
+      }));
+    }
+
+    const categorizedItems = answers[question.id] || {};
+    
+    const setCategorizedItems = (newItems: Record<string, string[]>) => {
+      setAnswers(prev => ({
+        ...prev,
+        [question.id]: newItems
+      }));
+    };
 
     const handleDragEnd = (event: DragEndEvent) => {
       const { active, over } = event;
@@ -120,7 +133,6 @@ export default function FormFill() {
       newCategorized[overId].push(activeId);
 
       setCategorizedItems(newCategorized);
-      updateAnswer(question.id, newCategorized);
     };
 
     return (
