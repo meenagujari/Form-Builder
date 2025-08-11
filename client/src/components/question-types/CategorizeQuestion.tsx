@@ -27,7 +27,7 @@ import { CSS } from '@dnd-kit/utilities';
 // import { ObjectUploader } from "../ObjectUploader";
 // import { apiRequest } from "@/lib/queryClient";
 import { CategorizeQuestion as CategorizeQuestionType } from "@shared/schema";
-import { LayersIcon, Settings, Plus, Trash2, Image, GripVertical } from "lucide-react";
+import { LayersIcon, Settings, Plus, Trash2, Image } from "lucide-react";
 
 // Sortable Item Component
 function SortableItem({ id, children }: { id: string; children: React.ReactNode }) {
@@ -47,13 +47,8 @@ function SortableItem({ id, children }: { id: string; children: React.ReactNode 
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <div className="flex items-center">
-        <div {...listeners} className="cursor-grab active:cursor-grabbing p-1 mr-2">
-          <GripVertical size={16} className="text-gray-400" />
-        </div>
-        {children}
-      </div>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+      {children}
     </div>
   );
 }
@@ -76,13 +71,8 @@ function SortableCategory({ id, children }: { id: string; children: React.ReactN
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <div className="flex items-center">
-        <div {...listeners} className="cursor-grab active:cursor-grabbing p-1 mr-2">
-          <GripVertical size={16} className="text-gray-400" />
-        </div>
-        {children}
-      </div>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+      {children}
     </div>
   );
 }
@@ -244,9 +234,8 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Items to Categorize - Drag & Drop Enabled */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-              <GripVertical size={16} className="mr-2 text-gray-400" />
-              Items to Categorize (Drag to reorder)
+            <h4 className="text-sm font-medium text-gray-700 mb-3">
+              Items to Categorize
             </h4>
             <DndContext 
               sensors={sensors}
@@ -309,9 +298,8 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
 
           {/* Categories - Drag & Drop Enabled */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-              <GripVertical size={16} className="mr-2 text-gray-400" />
-              Categories (Drag to reorder)
+            <h4 className="text-sm font-medium text-gray-700 mb-3">
+              Categories
             </h4>
             <DndContext 
               sensors={sensors}

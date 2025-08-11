@@ -25,7 +25,7 @@ import { CSS } from '@dnd-kit/utilities';
 // import { ObjectUploader } from "../ObjectUploader";
 // import { apiRequest } from "@/lib/queryClient";
 import { ClozeQuestion as ClozeQuestionType } from "@shared/schema";
-import { Underline, Settings, Trash2, Image, Info, GripVertical } from "lucide-react";
+import { Underline, Settings, Trash2, Image, Info } from "lucide-react";
 
 // Sortable Blank Component
 function SortableBlank({ id, children }: { id: string; children: React.ReactNode }) {
