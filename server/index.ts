@@ -37,6 +37,17 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Connect to MongoDB with fallback to in-memory storage
+  try {
+    const { connectToDatabase } = await import("./database");
+    await connectToDatabase();
+    log("Connected to MongoDB Atlas successfully");
+  } catch (error: any) {
+    log("MongoDB connection failed - using in-memory storage fallback");
+    console.error("MongoDB connection error:", error.message);
+    // Continue with in-memory storage - don't exit
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

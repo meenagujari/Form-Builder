@@ -26,13 +26,13 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot module replacement via Vite middleware in development mode
 
 ## Data Storage Solutions
-- **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
+- **Database**: MongoDB Atlas with Mongoose ODM for flexible document storage and automatic fallback to in-memory storage
 - **Schema Design**: 
-  - Users table with authentication fields
-  - Forms table with JSON field for flexible question storage
-  - Responses table linking to forms with JSON answers
+  - Forms collection with nested question arrays for flexible storage
+  - Responses collection linking to forms with JSON answers
   - UUID primary keys with automatic generation
-- **File Storage**: Google Cloud Storage for images and assets with custom ACL policy system
+  - Embedded question schemas supporting all three question types
+- **Connection Handling**: Graceful fallback from MongoDB Atlas to in-memory storage when connection fails
 - **Caching**: React Query provides client-side caching with stale-while-revalidate patterns
 
 ## Authentication and Authorization
@@ -43,8 +43,9 @@ Preferred communication style: Simple, everyday language.
 # External Dependencies
 
 ## Cloud Services
-- **Google Cloud Storage**: Primary file storage solution with automatic credential management via Replit sidecar
-- **Neon Database**: Serverless PostgreSQL database hosting (@neondatabase/serverless)
+- **MongoDB Atlas**: Primary database solution with connection string integration and fallback to in-memory storage
+- **Google Cloud Storage**: File storage solution with automatic credential management via Replit sidecar (configured but not actively used)
+- **Mongoose ODM**: MongoDB object document mapper for type-safe database operations
 
 ## UI and Design Libraries
 - **Radix UI**: Complete suite of accessible UI primitives (accordion, dialog, dropdown, etc.)
