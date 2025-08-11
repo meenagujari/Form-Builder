@@ -39,7 +39,7 @@ function DraggableItem({ id, children }: DraggableItemProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="flex items-center p-3 bg-white border border-gray-300 rounded-lg cursor-move hover:border-primary transition-colors"
+      className="flex items-center p-3 bg-white border border-gray-300 rounded-lg cursor-move hover:border-primary hover:shadow-md transition-all duration-200 active:scale-95"
     >
       <GripVertical size={16} className="text-gray-400 mr-2" />
       {children}
@@ -153,18 +153,23 @@ export default function FormFill() {
               {/* Uncategorized Items */}
               <div>
                 <h4 className="font-medium mb-3">Items to Categorize</h4>
-                <SortableContext items={categorizedItems.uncategorized || []} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-2" id="uncategorized">
-                    {(categorizedItems.uncategorized || []).map(itemId => {
-                      const item = question.items.find(i => i.id === itemId);
-                      return item ? (
-                        <DraggableItem key={itemId} id={itemId}>
-                          {item.text}
-                        </DraggableItem>
-                      ) : null;
-                    })}
-                  </div>
-                </SortableContext>
+                <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                  <SortableContext items={categorizedItems.uncategorized || []} strategy={verticalListSortingStrategy}>
+                    <div className="space-y-2" id="uncategorized">
+                      {(categorizedItems.uncategorized || []).map(itemId => {
+                        const item = question.items.find(i => i.id === itemId);
+                        return item ? (
+                          <DraggableItem key={itemId} id={itemId}>
+                            {item.text}
+                          </DraggableItem>
+                        ) : null;
+                      })}
+                      {(categorizedItems.uncategorized || []).length === 0 && (
+                        <p className="text-gray-500 text-center py-4">Drop items here to uncategorize them</p>
+                      )}
+                    </div>
+                  </SortableContext>
+                </div>
               </div>
 
               {/* Categories */}
@@ -172,7 +177,7 @@ export default function FormFill() {
                 <h4 className="font-medium mb-3">Categories</h4>
                 <div className="space-y-4">
                   {question.categories.map(category => (
-                    <div key={category.id} className="min-h-20 p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg" id={category.id}>
+                    <div key={category.id} className="min-h-20 p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors" id={category.id}>
                       <h5 className="font-medium text-blue-900 mb-2">{category.name}</h5>
                       <SortableContext items={categorizedItems[category.id] || []} strategy={verticalListSortingStrategy}>
                         <div className="space-y-2">
@@ -184,6 +189,9 @@ export default function FormFill() {
                               </DraggableItem>
                             ) : null;
                           })}
+                          {(categorizedItems[category.id] || []).length === 0 && (
+                            <p className="text-blue-600 text-center py-2 text-sm">Drop items here</p>
+                          )}
                         </div>
                       </SortableContext>
                     </div>
@@ -269,18 +277,33 @@ export default function FormFill() {
             `
           }} />
 
-          <div className="mt-4 space-y-2">
-            {question.blanks.map(blank => (
-              <div key={blank.id} className="flex items-center space-x-2">
-                <Label>Blank {question.blanks.indexOf(blank) + 1}:</Label>
-                <Input
-                  value={blankAnswers[blank.id] || ""}
-                  onChange={(e) => updateBlankAnswer(blank.id, e.target.value)}
-                  className="w-32"
-                  placeholder="Enter answer"
-                />
-              </div>
-            ))}
+          <div className="mt-6">
+            <h4 className="font-medium mb-3">Fill in the blanks (drag to reorder):</h4>
+            <DndContext collisionDetection={closestCenter} onDragEnd={(event) => {
+              // Handle reordering of blanks if needed
+              console.log('Blank reorder:', event);
+            }}>
+              <SortableContext items={question.blanks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-3">
+                  {question.blanks.map((blank, index) => (
+                    <div key={blank.id} 
+                         className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary transition-colors">
+                      <GripVertical size={16} className="text-gray-400 cursor-move" />
+                      <Label className="min-w-0 flex-shrink-0">Blank {index + 1}:</Label>
+                      <Input
+                        value={blankAnswers[blank.id] || ""}
+                        onChange={(e) => updateBlankAnswer(blank.id, e.target.value)}
+                        className="flex-1"
+                        placeholder={`Enter answer for "${blank.word}"`}
+                      />
+                      <span className="text-sm text-gray-500 min-w-0 flex-shrink-0">
+                        Original: "{blank.word}"
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         </CardContent>
       </Card>
