@@ -1,11 +1,51 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
 import { insertFormSchema, insertResponseSchema, formSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Create uploads directory if it doesn't exist
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  // Configure multer for file uploads
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, uploadsDir);
+      },
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    }),
+    fileFilter: (req, file, cb) => {
+      // Accept only image files
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(null, false);
+      }
+    },
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB limit
+    }
+  });
+
+  // Serve uploaded files
+  app.use('/uploads', (req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+  });
+  app.use('/uploads', express.static(uploadsDir));
   // Object storage routes for file uploads
   app.get("/public-objects/:filePath(*)", async (req, res) => {
     const filePath = req.params.filePath;
@@ -22,6 +62,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Real file upload endpoint
+  app.post("/api/upload", upload.single('file'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+      res.json({ 
+        success: true, 
+        url: fileUrl,
+        filename: req.file.filename,
+        originalname: req.file.originalname
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      res.status(500).json({ error: "File upload failed" });
+    }
+  });
+
+  // Legacy object storage endpoint for compatibility
   app.post("/api/objects/upload", async (req, res) => {
     try {
       // Check if object storage is configured
@@ -32,16 +93,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const uploadURL = await objectStorageService.getObjectEntityUploadURL();
         res.json({ uploadURL });
       } else {
-        // Fallback: return a mock URL for development
-        // In production, this would need proper file storage
-        const mockURL = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
-        res.json({ uploadURL: mockURL });
+        // Return an endpoint for direct file upload
+        res.json({ uploadURL: "/api/upload" });
       }
     } catch (error) {
       console.error("Error getting upload URL:", error);
-      // Fallback response for development
-      const fallbackURL = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==`;
-      res.json({ uploadURL: fallbackURL });
+      res.status(500).json({ error: "Failed to get upload URL" });
     }
   });
 

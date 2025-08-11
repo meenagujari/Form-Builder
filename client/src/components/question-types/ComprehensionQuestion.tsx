@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ObjectUploader } from "@/components/ObjectUploader";
+import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { ComprehensionQuestion as ComprehensionQuestionType } from "@shared/schema";
 import { BookOpen, Settings, Plus, Trash2, Image, Check } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
@@ -268,27 +268,13 @@ export function ComprehensionQuestion({ question, onUpdate, onDelete }: Comprehe
               </Button>
             </div>
           ) : (
-            <ObjectUploader
-              maxNumberOfFiles={1}
-              maxFileSize={5 * 1024 * 1024} // 5MB
-              onGetUploadParameters={async () => {
-                const response = await fetch("/api/objects/upload", { method: "POST" });
-                const data = await response.json();
-                return { method: "PUT" as const, url: data.uploadURL };
-              }}
-              onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-                if (result.successful && result.successful.length > 0) {
-                  const uploadURL = result.successful[0].uploadURL;
-                  onUpdate({ image: uploadURL });
-                }
-              }}
-              buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
-            >
-              <div className="flex items-center">
-                <Image size={16} className="mr-2" />
-                Add Image
-              </div>
-            </ObjectUploader>
+            <SimpleFileUpload
+              onUpload={(fileUrl) => onUpdate({ image: fileUrl })}
+              accept="image/*"
+              maxSize={5 * 1024 * 1024}
+              buttonText="Add Image"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+            />
           )}
         </div>
       </CardContent>

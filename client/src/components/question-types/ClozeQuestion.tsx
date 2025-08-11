@@ -21,7 +21,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ObjectUploader } from "@/components/ObjectUploader";
+import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { ClozeQuestion as ClozeQuestionType } from "@shared/schema";
 import { Underline, Settings, Trash2, Image, Info } from "lucide-react";
 import type { UploadResult } from "@uppy/core";
@@ -286,27 +286,13 @@ export function ClozeQuestion({ question, onUpdate, onDelete }: ClozeQuestionPro
               </Button>
             </div>
           ) : (
-            <ObjectUploader
-              maxNumberOfFiles={1}
-              maxFileSize={5 * 1024 * 1024} // 5MB
-              onGetUploadParameters={async () => {
-                const response = await fetch("/api/objects/upload", { method: "POST" });
-                const data = await response.json();
-                return { method: "PUT" as const, url: data.uploadURL };
-              }}
-              onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-                if (result.successful && result.successful.length > 0) {
-                  const uploadURL = result.successful[0].uploadURL;
-                  onUpdate({ image: uploadURL });
-                }
-              }}
-              buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
-            >
-              <div className="flex items-center">
-                <Image size={16} className="mr-2" />
-                Add Image
-              </div>
-            </ObjectUploader>
+            <SimpleFileUpload
+              onUpload={(fileUrl) => onUpdate({ image: fileUrl })}
+              accept="image/*"
+              maxSize={5 * 1024 * 1024}
+              buttonText="Add Image"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700"
+            />
           )}
         </div>
 

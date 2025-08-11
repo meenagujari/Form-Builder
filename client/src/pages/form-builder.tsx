@@ -14,9 +14,9 @@ import { PreviewPanel } from "@/components/PreviewPanel";
 import { CategorizeQuestion } from "@/components/question-types/CategorizeQuestion";
 import { ClozeQuestion } from "@/components/question-types/ClozeQuestion";
 import { ComprehensionQuestion } from "@/components/question-types/ComprehensionQuestion";
-import { ObjectUploader } from "@/components/ObjectUploader";
+import { SimpleFileUpload } from "@/components/SimpleFileUpload";
 import { Box, Edit, Eye, BarChart3, Share, Save, Plus, Settings, Trash2, Copy, FileText, Image } from "lucide-react";
-import type { UploadResult } from "@uppy/core";
+
 
 export default function FormBuilder() {
   const [match, params] = useRoute("/builder/:id");
@@ -322,27 +322,13 @@ export default function FormBuilder() {
                         </Button>
                       </div>
                     ) : (
-                      <ObjectUploader
-                        maxNumberOfFiles={1}
-                        maxFileSize={5 * 1024 * 1024} // 5MB
-                        onGetUploadParameters={async () => {
-                          const response = await fetch("/api/objects/upload", { method: "POST" });
-                          const data = await response.json();
-                          return { method: "PUT" as const, url: data.uploadURL };
-                        }}
-                        onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
-                          if (result.successful.length > 0) {
-                            const uploadURL = result.successful[0].uploadURL;
-                            setFormData({ ...formData, headerImage: uploadURL });
-                          }
-                        }}
-                        buttonClassName="w-full"
-                      >
-                        <div className="flex items-center justify-center">
-                          <Image size={16} className="mr-2" />
-                          Upload Header Image
-                        </div>
-                      </ObjectUploader>
+                      <SimpleFileUpload
+                        onUpload={(fileUrl) => setFormData({ ...formData, headerImage: fileUrl })}
+                        accept="image/*"
+                        maxSize={5 * 1024 * 1024}
+                        buttonText="Upload Header Image"
+                        className="w-full"
+                      />
                     )}
                   </div>
                 </div>
