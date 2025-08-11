@@ -13,7 +13,7 @@ import { PreviewPanel } from "@/components/PreviewPanel";
 import { CategorizeQuestion } from "@/components/question-types/CategorizeQuestion";
 import { ClozeQuestion } from "@/components/question-types/ClozeQuestion";
 import { ComprehensionQuestion } from "@/components/question-types/ComprehensionQuestion";
-import { Box, Edit, Eye, BarChart3, Share, Save } from "lucide-react";
+import { Box, Edit, Eye, BarChart3, Share, Save, Plus, Settings, Trash2, Copy, FileText } from "lucide-react";
 
 export default function FormBuilder() {
   const [match, params] = useRoute("/builder/:id");
@@ -197,110 +197,230 @@ export default function FormBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Box className="text-white" size={16} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Modern Header */}
+      <header className="glass-effect sticky top-0 z-50 border-b border-gray-200/50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center shadow-lg">
+                  <FileText className="text-white" size={20} />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    FormCraft
+                  </h1>
+                  <p className="text-xs text-gray-500 font-medium">Interactive Form Builder</p>
+                </div>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">FormCraft</h1>
+              
+              <div className="hidden md:flex items-center space-x-2 ml-8">
+                <Button variant="ghost" size="sm" className="text-primary bg-primary/10 font-medium">
+                  <Edit size={16} className="mr-2" />
+                  Builder
+                </Button>
+                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                  <Eye size={16} className="mr-2" />
+                  Preview
+                </Button>
+                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                  <BarChart3 size={16} className="mr-2" />
+                  Analytics
+                </Button>
+              </div>
             </div>
-            <div className="hidden md:flex items-center space-x-1 ml-8">
-              <Button variant="ghost" size="sm" className="text-primary bg-primary/10">
-                <Edit size={16} className="mr-2" />
-                Builder
+            
+            <div className="flex items-center space-x-3">
+              <div className="text-sm text-gray-500 hidden sm:block">
+                {formData.questions.length} question{formData.questions.length !== 1 ? 's' : ''}
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={handleSave}
+                disabled={createFormMutation.isPending || updateFormMutation.isPending}
+                className="hover:bg-gray-100"
+              >
+                <Save size={16} className="mr-2" />
+                Save Draft
               </Button>
-              <Button variant="ghost" size="sm">
-                <Eye size={16} className="mr-2" />
-                Preview
-              </Button>
-              <Button variant="ghost" size="sm">
-                <BarChart3 size={16} className="mr-2" />
-                Analytics
+              <Button 
+                onClick={handlePublish}
+                disabled={createFormMutation.isPending || updateFormMutation.isPending}
+                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg"
+              >
+                <Share size={16} className="mr-2" />
+                Publish Form
               </Button>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={handleSave}
-              disabled={createFormMutation.isPending || updateFormMutation.isPending}
-            >
-              <Save size={16} className="mr-2" />
-              Save Draft
-            </Button>
-            <Button 
-              onClick={handlePublish}
-              disabled={createFormMutation.isPending || updateFormMutation.isPending}
-            >
-              <Share size={16} className="mr-2" />
-              Publish
-            </Button>
           </div>
         </div>
       </header>
 
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <QuestionTypeSidebar 
-          formData={formData}
-          onFormDataChange={setFormData}
-          onAddQuestion={addQuestion}
-        />
+      <div className="flex">
+        {/* Enhanced Sidebar */}
+        <aside className="w-80 border-r border-gray-200/50 glass-effect min-h-screen">
+          <div className="p-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">Question Types</h2>
+              <p className="text-sm text-gray-600">Drag or click to add questions to your form</p>
+            </div>
+            
+            <div className="space-y-4">
+              <div 
+                onClick={() => addQuestion("categorize")}
+                className="sidebar-item"
+              >
+                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <Box size={20} />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Categorize</h3>
+                  <p className="text-sm text-gray-500">Drag & drop items into categories</p>
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => addQuestion("cloze")}
+                className="sidebar-item"
+              >
+                <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <Edit size={20} />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Cloze Test</h3>
+                  <p className="text-sm text-gray-500">Fill in the blank questions</p>
+                </div>
+              </div>
+              
+              <div 
+                onClick={() => addQuestion("comprehension")}
+                className="sidebar-item"
+              >
+                <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-900">Comprehension</h3>
+                  <p className="text-sm text-gray-500">Reading passage with MCQs</p>
+                </div>
+              </div>
+            </div>
 
-        {/* Main Editor */}
-        <main className="flex-1 bg-gray-50 overflow-auto">
-          <div className="max-w-4xl mx-auto p-6">
-            {/* Form Header */}
-            <FormHeader 
-              title={formData.title}
-              description={formData.description}
-              headerImage={formData.headerImage}
-              questionCount={formData.questions.length}
-              onUpdate={(updates) => setFormData(prev => ({ ...prev, ...updates }))}
-            />
+            {/* Form Settings */}
+            <div className="mt-8 p-4 bg-gray-50 rounded-xl">
+              <h3 className="font-medium text-gray-900 mb-3 flex items-center">
+                <Settings size={16} className="mr-2" />
+                Form Settings
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Form title"
+                    className="text-sm"
+                  />
+                </div>
+                <div>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Form description"
+                    className="text-sm resize-none"
+                    rows={2}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Enhanced Main Editor */}
+        <main className="flex-1 overflow-auto">
+          <div className="max-w-5xl mx-auto p-8">
+            {/* Form Header Card */}
+            <div className="mb-8">
+              <div className="question-card">
+                <div className="text-center">
+                  {formData.headerImage && (
+                    <div className="w-full h-32 gradient-bg rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
+                      <div className="absolute inset-0 bg-black/20"></div>
+                      <h1 className="text-2xl font-bold text-white z-10">{formData.title}</h1>
+                    </div>
+                  )}
+                  
+                  <h1 className="text-3xl font-bold text-gray-900 mb-3">
+                    {formData.title || "Untitled Form"}
+                  </h1>
+                  {formData.description && (
+                    <p className="text-lg text-gray-600 mb-4">{formData.description}</p>
+                  )}
+                  <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <FileText size={16} className="mr-2" />
+                      {formData.questions.length} questions
+                    </span>
+                    <span className="flex items-center">
+                      <Eye size={16} className="mr-2" />
+                      Interactive
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Questions */}
-            {formData.questions.map(renderQuestion)}
+            <div className="space-y-6">
+              {formData.questions.map((question, index) => (
+                <div key={question.id} className="relative group">
+                  <div className="absolute -left-12 top-6 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    {index + 1}
+                  </div>
+                  {renderQuestion(question)}
+                </div>
+              ))}
+            </div>
 
-            {/* Add Question Button */}
-            <div className="text-center py-8">
-              <div className="inline-flex space-x-4">
+            {/* Empty State / Add Question */}
+            {formData.questions.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Plus size={24} className="text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No questions yet</h3>
+                <p className="text-gray-500 mb-6">Start building your form by adding questions from the sidebar</p>
+                <div className="flex justify-center space-x-4">
+                  <Button onClick={() => addQuestion("categorize")} variant="outline">
+                    <Box size={16} className="mr-2" />
+                    Add Categorize
+                  </Button>
+                  <Button onClick={() => addQuestion("cloze")} variant="outline">
+                    <Edit size={16} className="mr-2" />
+                    Add Cloze
+                  </Button>
+                  <Button onClick={() => addQuestion("comprehension")} variant="outline">
+                    <FileText size={16} className="mr-2" />
+                    Add Comprehension
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
                 <Button
                   variant="outline"
                   size="lg"
                   onClick={() => addQuestion("categorize")}
-                  className="border-dashed"
+                  className="bg-white hover:bg-gray-50 shadow-sm"
                 >
-                  Add Categorize Question
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => addQuestion("cloze")}
-                  className="border-dashed"
-                >
-                  Add Cloze Question
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => addQuestion("comprehension")}
-                  className="border-dashed"
-                >
-                  Add Comprehension Question
+                  <Plus size={20} className="mr-2" />
+                  Add Another Question
                 </Button>
               </div>
-            </div>
+            )}
           </div>
         </main>
-
-        {/* Preview Panel */}
-        <PreviewPanel formData={formData} />
       </div>
     </div>
   );

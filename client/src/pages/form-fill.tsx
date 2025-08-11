@@ -342,58 +342,75 @@ export default function FormFill() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-6">
-        {/* Form Header */}
-        <Card className="mb-8">
-          <CardContent className="p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* Enhanced Form Header */}
+        <div className="question-card mb-8">
+          <div className="text-center">
             {(form as Form).headerImage && (
-              <div className="w-full h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg mb-6 flex items-center justify-center relative overflow-hidden">
+              <div className="w-full h-48 gradient-bg rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-black/20"></div>
                 <h1 className="text-3xl font-bold text-white z-10">{(form as Form).title}</h1>
               </div>
             )}
             
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">{(form as Form).title}</h1>
-              {(form as Form).description && (
-                <p className="text-gray-600 text-lg mb-4">{(form as Form).description}</p>
-              )}
-              <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
-                <span>📝 {((form as Form).questions as Question[])?.length || 0} questions</span>
-              </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">{(form as Form).title}</h1>
+            {(form as Form).description && (
+              <p className="text-lg text-gray-600 mb-6 leading-relaxed">{(form as Form).description}</p>
+            )}
+            <div className="flex items-center justify-center space-x-6 text-sm text-gray-500">
+              <span className="flex items-center bg-blue-50 px-3 py-2 rounded-full">
+                📝 {((form as Form).questions as Question[])?.length || 0} questions
+              </span>
+              <span className="flex items-center bg-green-50 px-3 py-2 rounded-full">
+                ⏱️ Interactive form
+              </span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* User Email */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <Label htmlFor="email" className="text-base font-medium">Email (optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="mt-2"
-            />
-          </CardContent>
-        </Card>
+        <div className="question-card mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+              <span className="text-lg">✉️</span>
+            </div>
+            <div>
+              <Label htmlFor="email" className="text-lg font-semibold text-gray-900">Contact Information</Label>
+              <p className="text-sm text-gray-500">Optional - we'll use this to send you a copy of your responses</p>
+            </div>
+          </div>
+          <Input
+            id="email"
+            type="email"
+            value={userEmail}
+            onChange={(e) => setUserEmail(e.target.value)}
+            placeholder="Enter your email address"
+            className="w-full"
+          />
+        </div>
 
         {/* Questions */}
         {((form as Form).questions as Question[])?.map(renderQuestion)}
 
         {/* Submit Button */}
-        <div className="text-center">
+        <div className="text-center py-8">
           <Button 
             onClick={handleSubmit}
             disabled={submitMutation.isPending}
             size="lg"
-            className="px-8"
+            className="px-12 py-3 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg text-lg font-semibold"
           >
-            {submitMutation.isPending ? "Submitting..." : "Submit Form"}
+            {submitMutation.isPending ? (
+              <span className="flex items-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                Submitting...
+              </span>
+            ) : (
+              "Submit Form"
+            )}
           </Button>
+          <p className="text-sm text-gray-500 mt-3">Your responses will be recorded securely</p>
         </div>
       </div>
     </div>
