@@ -143,11 +143,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/forms", async (req, res) => {
     try {
+      console.log("Creating form with data:", JSON.stringify(req.body, null, 2));
       const validatedData = insertFormSchema.parse(req.body);
+      console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       const form = await storage.createForm(validatedData);
+      console.log("Created form:", JSON.stringify(form, null, 2));
       res.status(201).json(form);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Error creating form:", error);
@@ -157,14 +161,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/forms/:id", async (req, res) => {
     try {
+      console.log("Updating form with data:", JSON.stringify(req.body, null, 2));
       const validatedData = insertFormSchema.partial().parse(req.body);
+      console.log("Validated data:", JSON.stringify(validatedData, null, 2));
       const form = await storage.updateForm(req.params.id, validatedData);
       if (!form) {
         return res.status(404).json({ error: "Form not found" });
       }
+      console.log("Updated form:", JSON.stringify(form, null, 2));
       res.json(form);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation error:", error.errors);
         return res.status(400).json({ error: "Validation failed", details: error.errors });
       }
       console.error("Error updating form:", error);
