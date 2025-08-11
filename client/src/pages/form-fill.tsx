@@ -89,6 +89,19 @@ function DroppableBlank({ id, children, isOver }: { id: string; children: React.
   );
 }
 
+function DroppableCategory({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${isOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function FormFill() {
   const [match, params] = useRoute("/fill/:shareUrl");
   const { toast } = useToast();
@@ -189,13 +202,13 @@ export default function FormFill() {
           )}
           
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Uncategorized Items */}
+            <div className="space-y-6">
+              {/* Items to Categorize */}
               <div>
                 <h4 className="font-medium mb-3">Items to Categorize</h4>
-                <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                  <SortableContext items={categorizedItems.uncategorized || []} strategy={verticalListSortingStrategy}>
-                    <div className="space-y-2" id="uncategorized">
+                <DroppableCategory id="uncategorized">
+                  <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                    <div className="flex flex-wrap gap-2">
                       {(categorizedItems.uncategorized || []).map(itemId => {
                         const item = question.items.find(i => i.id === itemId);
                         return item ? (
@@ -205,22 +218,22 @@ export default function FormFill() {
                         ) : null;
                       })}
                       {(categorizedItems.uncategorized || []).length === 0 && (
-                        <p className="text-gray-500 text-center py-4">Drop items here to uncategorize them</p>
+                        <p className="text-gray-500 text-center py-4 w-full">Drop items here to uncategorize them</p>
                       )}
                     </div>
-                  </SortableContext>
-                </div>
+                  </div>
+                </DroppableCategory>
               </div>
 
               {/* Categories */}
               <div>
                 <h4 className="font-medium mb-3">Categories</h4>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {question.categories.map(category => (
-                    <div key={category.id} className="min-h-20 p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors" id={category.id}>
-                      <h5 className="font-medium text-blue-900 mb-2">{category.name}</h5>
-                      <SortableContext items={categorizedItems[category.id] || []} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-2">
+                    <DroppableCategory key={category.id} id={category.id}>
+                      <div className="min-h-24 p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                        <h5 className="font-medium text-blue-900 mb-2">{category.name}</h5>
+                        <div className="flex flex-wrap gap-2">
                           {(categorizedItems[category.id] || []).map(itemId => {
                             const item = question.items.find(i => i.id === itemId);
                             return item ? (
@@ -230,11 +243,11 @@ export default function FormFill() {
                             ) : null;
                           })}
                           {(categorizedItems[category.id] || []).length === 0 && (
-                            <p className="text-blue-600 text-center py-2 text-sm">Drop items here</p>
+                            <p className="text-blue-600 text-center py-2 text-sm w-full">Drop items here</p>
                           )}
                         </div>
-                      </SortableContext>
-                    </div>
+                      </div>
+                    </DroppableCategory>
                   ))}
                 </div>
               </div>
