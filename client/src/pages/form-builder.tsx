@@ -132,10 +132,13 @@ export default function FormBuilder() {
       };
     }
 
-    setFormData(prev => ({
-      ...prev,
-      questions: [...prev.questions, newQuestion],
-    }));
+    console.log("New question created:", newQuestion);
+    const updatedFormData = {
+      ...formData,
+      questions: [...formData.questions, newQuestion],
+    };
+    console.log("Updated form data:", updatedFormData);
+    setFormData(updatedFormData);
   };
 
   const updateQuestion = (questionId: string, updates: Partial<Question>) => {
@@ -385,14 +388,18 @@ export default function FormBuilder() {
 
             {/* Questions */}
             <div className="space-y-6">
-              {formData.questions.map((question, index) => (
-                <div key={question.id} className="relative group">
-                  <div className="absolute -left-12 top-6 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
-                    {index + 1}
+              {console.log("Rendering questions:", formData.questions)}
+              {formData.questions.map((question, index) => {
+                console.log("Rendering question:", question);
+                return (
+                  <div key={question.id} className="relative group">
+                    <div className="absolute -left-12 top-6 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium">
+                      {index + 1}
+                    </div>
+                    {renderQuestion(question)}
                   </div>
-                  {renderQuestion(question)}
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Empty State / Add Question */}
