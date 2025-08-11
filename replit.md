@@ -2,6 +2,14 @@
 
 This is a modern full-stack form builder application that allows users to create interactive forms with three specialized question types: categorization, cloze (fill-in-the-blank), and reading comprehension. The application features a split-screen interface with a form builder on one side and real-time preview on the other, along with a separate form-filling interface for respondents.
 
+## Recent Changes
+
+- **Image Upload System**: Implemented complete file upload functionality for form headers and question images using multer with local file storage
+- **Header Image Display**: Fixed header image rendering in both builder and submission forms with proper background image styling
+- **File Management**: Added professional upload interface with progress tracking, image preview, and delete functionality
+- **Cross-Platform Compatibility**: Ensured the application works in VS Code, Replit, and other development environments
+- **Documentation**: Created comprehensive README.md with setup instructions, usage guide, and deployment information
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
