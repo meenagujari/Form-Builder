@@ -180,8 +180,8 @@ export default function FormFill() {
 
       // Remove item from current category
       const newCategorized = { ...categorizedItems };
-      Object.keys(newCategorized).forEach(categoryId => {
-        newCategorized[categoryId] = newCategorized[categoryId].filter(id => id !== activeId);
+      Object.keys(newCategorized).forEach((categoryId: string) => {
+        newCategorized[categoryId] = newCategorized[categoryId].filter((id: string) => id !== activeId);
       });
 
       // Add item to new category
@@ -209,7 +209,7 @@ export default function FormFill() {
                 <DroppableCategory id="uncategorized">
                   <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
                     <div className="flex flex-wrap gap-2">
-                      {(categorizedItems.uncategorized || []).map(itemId => {
+                      {(categorizedItems.uncategorized || []).map((itemId: string) => {
                         const item = question.items.find(i => i.id === itemId);
                         return item ? (
                           <DraggableItem key={itemId} id={itemId}>
@@ -234,7 +234,7 @@ export default function FormFill() {
                       <div className="min-h-24 p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
                         <h5 className="font-medium text-blue-900 mb-2">{category.name}</h5>
                         <div className="flex flex-wrap gap-2">
-                          {(categorizedItems[category.id] || []).map(itemId => {
+                          {(categorizedItems[category.id] || []).map((itemId: string) => {
                             const item = question.items.find(i => i.id === itemId);
                             return item ? (
                               <DraggableItem key={itemId} id={itemId}>
@@ -409,8 +409,8 @@ export default function FormFill() {
                 <div className="flex flex-wrap gap-2">
                   <SortableContext items={question.blanks.filter(b => !usedOptions.includes(b.word)).map(b => `answer-option-${b.word}`)} strategy={verticalListSortingStrategy}>
                     {question.blanks
-                      .filter(blank => !usedOptions.includes(blank.word))
-                      .map(blank => (
+                      .filter((blank) => !usedOptions.includes(blank.word))
+                      .map((blank) => (
                         <DraggableAnswerOption key={`answer-option-${blank.word}`} id={`answer-option-${blank.word}`}>
                           <div className="px-3 py-2 bg-blue-100 border border-blue-300 rounded-lg cursor-move hover:bg-blue-200 transition-colors">
                             <span className="text-blue-800 font-medium">{blank.word}</span>
