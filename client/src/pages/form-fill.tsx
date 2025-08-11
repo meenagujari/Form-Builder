@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Form, Question, CategorizeQuestion, ClozeQuestion, ComprehensionQuestion } from "@shared/schema";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { DndContext, closestCenter, DragEndEvent, useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical } from "lucide-react";
@@ -70,6 +70,20 @@ function DraggableAnswerOption({ id, children }: DraggableItemProps) {
     >
       {children}
     </div>
+  );
+}
+
+function DroppableBlank({ id, children, isOver }: { id: string; children: React.ReactNode; isOver: boolean }) {
+  const { setNodeRef } = useDroppable({ id });
+
+  return (
+    <span
+      ref={setNodeRef}
+      className={`inline-drop-zone ${isOver ? 'drag-over' : ''}`}
+      data-blank={id}
+    >
+      {children}
+    </span>
   );
 }
 
@@ -250,18 +264,36 @@ export default function FormFill() {
       }));
     };
 
-    // Parse text with blanks as drop zones
+    // Parse text with blanks as React components
     const renderTextWithBlanks = () => {
       let text = question.text;
-      const sortedBlanks = [...question.blanks].sort((a, b) => b.position - a.position);
+      const sortedBlanks = [...question.blanks].sort((a, b) => a.position - b.position);
+      const parts: (string | { type: 'blank'; id: string; answer: string })[] = [];
+      
+      let lastPosition = 0;
       
       sortedBlanks.forEach(blank => {
-        const answer = blankAnswers[blank.id] || '';
-        const dropZone = `<span id="${blank.id}" data-blank="${blank.id}" class="inline-drop-zone ${answer ? 'filled' : ''}">${answer || '____'}</span>`;
-        text = text.substring(0, blank.position) + dropZone + text.substring(blank.position + blank.word.length);
+        // Add text before the blank
+        if (blank.position > lastPosition) {
+          parts.push(text.substring(lastPosition, blank.position));
+        }
+        
+        // Add the blank
+        parts.push({
+          type: 'blank',
+          id: blank.id,
+          answer: blankAnswers[blank.id] || ''
+        });
+        
+        lastPosition = blank.position + blank.word.length;
       });
-
-      return text;
+      
+      // Add remaining text
+      if (lastPosition < text.length) {
+        parts.push(text.substring(lastPosition));
+      }
+      
+      return parts;
     };
 
     return (
@@ -301,6 +333,11 @@ export default function FormFill() {
               border-bottom-color: #22c55e;
               color: #15803d;
             }
+            .inline-drop-zone.drag-over {
+              background: rgba(99, 102, 241, 0.3);
+              border-bottom-color: #4f46e5;
+              transform: scale(1.05);
+            }
           ` }} />
 
           <div className="mt-6">
@@ -339,14 +376,21 @@ export default function FormFill() {
                 </div>
               </div>
 
-              {/* Drop Zones for Blanks */}
+              {/* Text with Droppable Blanks */}
               <div className="text-base leading-relaxed">
-                <SortableContext items={question.blanks.map(b => b.id)} strategy={verticalListSortingStrategy}>
-                  <div 
-                    className="text-base leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: renderTextWithBlanks() }}
-                  />
-                </SortableContext>
+                {renderTextWithBlanks().map((part, index) => {
+                  if (typeof part === 'string') {
+                    return <span key={index}>{part}</span>;
+                  } else {
+                    return (
+                      <DroppableBlank key={part.id} id={part.id} isOver={false}>
+                        <span className={`inline-drop-zone ${part.answer ? 'filled' : ''}`}>
+                          {part.answer || '____'}
+                        </span>
+                      </DroppableBlank>
+                    );
+                  }
+                })}
               </div>
             </DndContext>
           </div>
