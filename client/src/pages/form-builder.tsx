@@ -409,40 +409,14 @@ export default function FormBuilder() {
               })}
             </div>
 
-            {/* Empty State / Add Question */}
-            {formData.questions.length === 0 ? (
+            {/* Empty State */}
+            {formData.questions.length === 0 && (
               <div className="text-center py-16">
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Plus size={24} className="text-gray-400" />
+                  <FileText size={24} className="text-gray-400" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No questions yet</h3>
-                <p className="text-gray-500 mb-6">Start building your form by adding questions from the sidebar</p>
-                <div className="flex justify-center space-x-4">
-                  <Button onClick={() => addQuestion("categorize")} variant="outline">
-                    <Box size={16} className="mr-2" />
-                    Add Categorize
-                  </Button>
-                  <Button onClick={() => addQuestion("cloze")} variant="outline">
-                    <Edit size={16} className="mr-2" />
-                    Add Cloze
-                  </Button>
-                  <Button onClick={() => addQuestion("comprehension")} variant="outline">
-                    <FileText size={16} className="mr-2" />
-                    Add Comprehension
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => addQuestion("categorize")}
-                  className="bg-white hover:bg-gray-50 shadow-sm"
-                >
-                  <Plus size={20} className="mr-2" />
-                  Add Another Question
-                </Button>
+                <p className="text-gray-500">Start building your form by adding questions from the sidebar</p>
               </div>
             )}
           </div>
