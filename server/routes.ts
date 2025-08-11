@@ -57,6 +57,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Share route for form filling mode
+  app.get("/api/share/:shareUrl", async (req, res) => {
+    try {
+      // For simplicity, we'll use the form ID as the share URL
+      const form = await storage.getForm(req.params.shareUrl);
+      if (!form) {
+        return res.status(404).json({ error: "Form not found" });
+      }
+      res.json(form);
+    } catch (error) {
+      console.error("Error fetching shared form:", error);
+      res.status(500).json({ error: "Failed to fetch form" });
+    }
+  });
+
   app.post("/api/forms", async (req, res) => {
     try {
       const validatedData = insertFormSchema.parse(req.body);

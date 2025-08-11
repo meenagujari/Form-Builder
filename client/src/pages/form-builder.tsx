@@ -223,9 +223,25 @@ export default function FormBuilder() {
                   <Edit size={16} className="mr-2" />
                   Builder
                 </Button>
-                <Button variant="ghost" size="sm" className="hover:bg-gray-100">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="hover:bg-gray-100"
+                  onClick={() => {
+                    if (formId) {
+                      // Open form filling mode in new tab
+                      window.open(`/fill/${formId}`, '_blank');
+                    } else {
+                      toast({
+                        title: "Save form first",
+                        description: "Please save your form before previewing it.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
                   <Eye size={16} className="mr-2" />
-                  Preview
+                  Preview Form
                 </Button>
                 <Button variant="ghost" size="sm" className="hover:bg-gray-100">
                   <BarChart3 size={16} className="mr-2" />
