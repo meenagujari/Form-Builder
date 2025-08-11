@@ -337,32 +337,34 @@ export default function FormFill() {
           
           <style dangerouslySetInnerHTML={{ __html: `
             .inline-drop-zone {
-              border-bottom: 2px solid #6366f1;
-              background: rgba(99, 102, 241, 0.1);
-              padding: 2px 8px;
+              border: 2px solid #e5e7eb;
+              background: #f9fafb;
+              padding: 8px 12px;
               margin: 0 4px;
-              min-width: 60px;
+              min-width: 80px;
+              min-height: 32px;
               font-weight: 500;
-              border-radius: 4px;
+              border-radius: 8px;
               display: inline-block;
-              min-height: 24px;
               vertical-align: middle;
               cursor: pointer;
               transition: all 0.2s;
+              text-align: center;
             }
             .inline-drop-zone:hover {
-              background: rgba(99, 102, 241, 0.2);
-              border-bottom-color: #4f46e5;
+              background: rgba(99, 102, 241, 0.1);
+              border-color: #6366f1;
             }
             .inline-drop-zone.filled {
               background: rgba(34, 197, 94, 0.1);
-              border-bottom-color: #22c55e;
+              border-color: #22c55e;
               color: #15803d;
             }
             .inline-drop-zone.drag-over {
-              background: rgba(99, 102, 241, 0.3);
-              border-bottom-color: #4f46e5;
+              background: rgba(99, 102, 241, 0.2);
+              border-color: #4f46e5;
               transform: scale(1.05);
+              box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
             }
           ` }} />
 
@@ -430,7 +432,7 @@ export default function FormFill() {
                             </span>
                           </span>
                         ) : (
-                          <span className="inline-drop-zone">____</span>
+                          <span className="inline-drop-zone">&nbsp;</span>
                         )}
                       </DroppableBlank>
                     );
