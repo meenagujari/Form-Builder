@@ -45,13 +45,8 @@ function SortableBlank({ id, children }: { id: string; children: React.ReactNode
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
-      <div className="flex items-center">
-        <div {...listeners} className="cursor-grab active:cursor-grabbing p-1 mr-2">
-          <GripVertical size={16} className="text-gray-400" />
-        </div>
-        {children}
-      </div>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+      {children}
     </div>
   );
 }
@@ -235,9 +230,8 @@ export function ClozeQuestion({ question, onUpdate, onDelete }: ClozeQuestionPro
 
         {question.blanks.length > 0 && (
           <div className="mb-6">
-            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-              <GripVertical size={16} className="mr-2 text-gray-400" />
-              Blank Fields Created (Drag to reorder)
+            <h4 className="text-sm font-medium text-gray-700 mb-3">
+              Blank Fields Created
             </h4>
             <DndContext 
               sensors={sensors}
