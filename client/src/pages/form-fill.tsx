@@ -250,18 +250,42 @@ export default function FormFill() {
     if (!answers[question.id]) {
       setAnswers(prev => ({
         ...prev,
-        [question.id]: {}
+        [question.id]: { placedAnswers: {}, usedOptions: [] }
       }));
     }
 
-    const blankAnswers = answers[question.id] || {};
+    const questionAnswers = answers[question.id] || { placedAnswers: {}, usedOptions: [] };
+    const placedAnswers = questionAnswers.placedAnswers || {};
+    const usedOptions = questionAnswers.usedOptions || [];
 
-    const updateBlankAnswer = (blankId: string, value: string) => {
-      const newAnswers = { ...blankAnswers, [blankId]: value };
+    const updateBlankAnswer = (blankId: string, optionWord: string) => {
+      const newPlacedAnswers = { ...placedAnswers, [blankId]: optionWord };
+      const newUsedOptions = [...usedOptions, optionWord];
+      
       setAnswers(prev => ({
         ...prev,
-        [question.id]: newAnswers
+        [question.id]: {
+          placedAnswers: newPlacedAnswers,
+          usedOptions: newUsedOptions
+        }
       }));
+    };
+
+    const removeAnswerFromBlank = (blankId: string) => {
+      const removedWord = placedAnswers[blankId];
+      if (removedWord) {
+        const newPlacedAnswers = { ...placedAnswers };
+        delete newPlacedAnswers[blankId];
+        const newUsedOptions = usedOptions.filter(word => word !== removedWord);
+        
+        setAnswers(prev => ({
+          ...prev,
+          [question.id]: {
+            placedAnswers: newPlacedAnswers,
+            usedOptions: newUsedOptions
+          }
+        }));
+      }
     };
 
     // Parse text with blanks as React components
@@ -282,7 +306,7 @@ export default function FormFill() {
         parts.push({
           type: 'blank',
           id: blank.id,
-          answer: blankAnswers[blank.id] || ''
+          answer: placedAnswers[blank.id] || ''
         });
         
         lastPosition = blank.position + blank.word.length;
@@ -356,6 +380,10 @@ export default function FormFill() {
                 const targetBlank = question.blanks.find(b => b.id === overId);
                 if (targetBlank && activeId.startsWith('answer-option-')) {
                   const answerText = activeId.replace('answer-option-', '');
+                  // Remove any existing answer from this blank first
+                  if (placedAnswers[targetBlank.id]) {
+                    removeAnswerFromBlank(targetBlank.id);
+                  }
                   updateBlankAnswer(targetBlank.id, answerText);
                 }
               }}
@@ -364,16 +392,21 @@ export default function FormFill() {
               <div className="mb-4">
                 <h5 className="text-sm font-medium text-gray-700 mb-2">Answer Options:</h5>
                 <div className="flex flex-wrap gap-2">
-                  <SortableContext items={question.blanks.map(b => `answer-option-${b.word}`)} strategy={verticalListSortingStrategy}>
-                    {question.blanks.map(blank => (
-                      <DraggableAnswerOption key={`answer-option-${blank.word}`} id={`answer-option-${blank.word}`}>
-                        <div className="px-3 py-2 bg-blue-100 border border-blue-300 rounded-lg cursor-move hover:bg-blue-200 transition-colors">
-                          <span className="text-blue-800 font-medium">{blank.word}</span>
-                        </div>
-                      </DraggableAnswerOption>
-                    ))}
+                  <SortableContext items={question.blanks.filter(b => !usedOptions.includes(b.word)).map(b => `answer-option-${b.word}`)} strategy={verticalListSortingStrategy}>
+                    {question.blanks
+                      .filter(blank => !usedOptions.includes(blank.word))
+                      .map(blank => (
+                        <DraggableAnswerOption key={`answer-option-${blank.word}`} id={`answer-option-${blank.word}`}>
+                          <div className="px-3 py-2 bg-blue-100 border border-blue-300 rounded-lg cursor-move hover:bg-blue-200 transition-colors">
+                            <span className="text-blue-800 font-medium">{blank.word}</span>
+                          </div>
+                        </DraggableAnswerOption>
+                      ))}
                   </SortableContext>
                 </div>
+                {usedOptions.length === question.blanks.length && (
+                  <p className="text-sm text-gray-500 mt-2">All options have been placed!</p>
+                )}
               </div>
 
               {/* Text with Droppable Blanks */}
@@ -384,9 +417,19 @@ export default function FormFill() {
                   } else {
                     return (
                       <DroppableBlank key={part.id} id={part.id} isOver={false}>
-                        <span className={`inline-drop-zone ${part.answer ? 'filled' : ''}`}>
-                          {part.answer || '____'}
-                        </span>
+                        {part.answer ? (
+                          <span 
+                            className="inline-drop-zone filled cursor-pointer"
+                            onClick={() => removeAnswerFromBlank(part.id)}
+                            title="Click to remove"
+                          >
+                            <span className="px-2 py-1 bg-green-100 border border-green-300 rounded text-green-800 font-medium">
+                              {part.answer}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="inline-drop-zone">____</span>
+                        )}
                       </DroppableBlank>
                     );
                   }
