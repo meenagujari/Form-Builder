@@ -561,26 +561,7 @@ export default function FormFill() {
           </div>
         </div>
 
-        {/* User Email */}
-        <div className="question-card mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-              <span className="text-lg">✉️</span>
-            </div>
-            <div>
-              <Label htmlFor="email" className="text-lg font-semibold text-gray-900">Contact Information</Label>
-              <p className="text-sm text-gray-500">Optional - we'll use this to send you a copy of your responses</p>
-            </div>
-          </div>
-          <Input
-            id="email"
-            type="email"
-            value={userEmail}
-            onChange={(e) => setUserEmail(e.target.value)}
-            placeholder="Enter your email address"
-            className="w-full"
-          />
-        </div>
+
 
         {/* Questions */}
         {((form as Form).questions as Question[])?.map(renderQuestion)}
