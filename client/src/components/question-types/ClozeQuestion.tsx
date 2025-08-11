@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { ObjectUploader } from "../ObjectUploader";
-import { apiRequest } from "@/lib/queryClient";
+// Image upload temporarily disabled
+// import { ObjectUploader } from "../ObjectUploader";
+// import { apiRequest } from "@/lib/queryClient";
 import { ClozeQuestion as ClozeQuestionType } from "@shared/schema";
 import { Underline, Settings, Trash2, Image, Info } from "lucide-react";
 
@@ -17,21 +18,22 @@ export function ClozeQuestion({ question, onUpdate, onDelete }: ClozeQuestionPro
   const [selection, setSelection] = useState<{ start: number; end: number; text: string } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload");
-    const data = await response.json();
-    return {
-      method: "PUT" as const,
-      url: data.uploadURL,
-    };
-  };
+  // Image upload temporarily disabled for assignment
+  // const handleGetUploadParameters = async () => {
+  //   const response = await apiRequest("POST", "/api/objects/upload");
+  //   const data = await response.json();
+  //   return {
+  //     method: "PUT" as const,
+  //     url: data.uploadURL,
+  //   };
+  // };
 
-  const handleUploadComplete = (result: any) => {
-    if (result.successful && result.successful[0]) {
-      const uploadedUrl = result.successful[0].uploadURL;
-      onUpdate({ image: uploadedUrl });
-    }
-  };
+  // const handleUploadComplete = (result: any) => {
+  //   if (result.successful && result.successful[0]) {
+  //     const uploadedUrl = result.successful[0].uploadURL;
+  //     onUpdate({ image: uploadedUrl });
+  //   }
+  // };
 
   const handleTextChange = (event: React.FormEvent<HTMLDivElement>) => {
     const text = event.currentTarget.textContent || "";
@@ -188,24 +190,7 @@ export function ClozeQuestion({ question, onUpdate, onDelete }: ClozeQuestionPro
           </div>
         )}
 
-        <div className="pt-4 border-t border-gray-200">
-          <ObjectUploader
-            maxNumberOfFiles={1}
-            maxFileSize={10485760}
-            onGetUploadParameters={handleGetUploadParameters}
-            onComplete={handleUploadComplete}
-            buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
-          >
-            <Image size={16} className="mr-2" />
-            {question.image ? "Change Image" : "Add Image"}
-          </ObjectUploader>
-          
-          {question.image && (
-            <div className="mt-4">
-              <img src={question.image} alt="Question" className="max-w-xs rounded border" />
-            </div>
-          )}
-        </div>
+        {/* Image upload temporarily disabled for assignment */}
       </CardContent>
     </Card>
   );

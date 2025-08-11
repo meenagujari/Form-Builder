@@ -5,8 +5,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ObjectUploader } from "../ObjectUploader";
-import { apiRequest } from "@/lib/queryClient";
+// Image upload temporarily disabled  
+// import { ObjectUploader } from "../ObjectUploader";
+// import { apiRequest } from "@/lib/queryClient";
 import { ComprehensionQuestion as ComprehensionQuestionType } from "@shared/schema";
 import { BookOpen, Settings, Plus, Trash2, Image, Check } from "lucide-react";
 
@@ -19,21 +20,22 @@ interface ComprehensionQuestionProps {
 export function ComprehensionQuestion({ question, onUpdate, onDelete }: ComprehensionQuestionProps) {
   const [newMcqQuestion, setNewMcqQuestion] = useState("");
 
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload");
-    const data = await response.json();
-    return {
-      method: "PUT" as const,
-      url: data.uploadURL,
-    };
-  };
+  // Image upload temporarily disabled for assignment
+  // const handleGetUploadParameters = async () => {
+  //   const response = await apiRequest("POST", "/api/objects/upload");
+  //   const data = await response.json();
+  //   return {
+  //     method: "PUT" as const,
+  //     url: data.uploadURL,
+  //   };
+  // };
 
-  const handleUploadComplete = (result: any) => {
-    if (result.successful && result.successful[0]) {
-      const uploadedUrl = result.successful[0].uploadURL;
-      onUpdate({ image: uploadedUrl });
-    }
-  };
+  // const handleUploadComplete = (result: any) => {
+  //   if (result.successful && result.successful[0]) {
+  //     const uploadedUrl = result.successful[0].uploadURL;
+  //     onUpdate({ image: uploadedUrl });
+  //   }
+  // };
 
   const addMcqQuestion = () => {
     if (!newMcqQuestion.trim()) return;
@@ -247,24 +249,7 @@ export function ComprehensionQuestion({ question, onUpdate, onDelete }: Comprehe
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200">
-          <ObjectUploader
-            maxNumberOfFiles={1}
-            maxFileSize={10485760}
-            onGetUploadParameters={handleGetUploadParameters}
-            onComplete={handleUploadComplete}
-            buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
-          >
-            <Image size={16} className="mr-2" />
-            {question.image ? "Change Image" : "Add Image to Passage"}
-          </ObjectUploader>
-          
-          {question.image && (
-            <div className="mt-4">
-              <img src={question.image} alt="Question" className="max-w-xs rounded border" />
-            </div>
-          )}
-        </div>
+        {/* Image upload temporarily disabled for assignment */}
       </CardContent>
     </Card>
   );
