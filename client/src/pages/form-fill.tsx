@@ -39,9 +39,8 @@ function DraggableItem({ id, children }: DraggableItemProps) {
       style={style}
       {...attributes}
       {...listeners}
-      className="flex items-center p-3 bg-white border border-gray-300 rounded-lg cursor-move hover:border-primary hover:shadow-md transition-all duration-200 active:scale-95"
+      className="px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-move hover:bg-gray-50 transition-colors shadow-sm select-none"
     >
-      <GripVertical size={16} className="text-gray-400 mr-2" />
       {children}
     </div>
   );
