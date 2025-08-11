@@ -553,14 +553,14 @@ export default function FormFill() {
         {/* Enhanced Form Header */}
         <div className="question-card mb-8">
           <div className="text-center">
-            {(form as Form).headerImage && (
-              <div className="w-full h-48 gradient-bg rounded-xl mb-6 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-black/20"></div>
+            {(form as Form).headerImage ? (
+              <div className="w-full h-48 rounded-xl mb-6 flex items-center justify-center relative overflow-hidden" style={{ backgroundImage: `url(${(form as Form).headerImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                <div className="absolute inset-0 bg-black/40"></div>
                 <h1 className="text-3xl font-bold text-white z-10">{(form as Form).title}</h1>
               </div>
+            ) : (
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{(form as Form).title}</h1>
             )}
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{(form as Form).title}</h1>
             {(form as Form).description && (
               <p className="text-lg text-gray-600 mb-6 leading-relaxed">{(form as Form).description}</p>
             )}
