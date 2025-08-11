@@ -253,7 +253,6 @@ export function ClozeQuestion({ question, onUpdate, onDelete }: ClozeQuestionPro
                     <SortableBlank key={blank.id} id={blank.id}>
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg flex-1">
                         <div className="flex items-center space-x-3">
-                          <span className="text-sm font-medium">Blank {index + 1}:</span>
                           <span className="px-2 py-1 bg-yellow-100 rounded text-sm font-medium">
                             {blank.word}
                           </span>
