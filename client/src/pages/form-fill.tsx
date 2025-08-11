@@ -106,6 +106,11 @@ export default function FormFill() {
 
     const categorizedItems = answers[question.id] || {};
     
+    // Ensure uncategorized array exists
+    if (!categorizedItems.uncategorized) {
+      categorizedItems.uncategorized = question.items.map(item => item.id);
+    }
+    
     const setCategorizedItems = (newItems: Record<string, string[]>) => {
       setAnswers(prev => ({
         ...prev,
@@ -148,9 +153,9 @@ export default function FormFill() {
               {/* Uncategorized Items */}
               <div>
                 <h4 className="font-medium mb-3">Items to Categorize</h4>
-                <SortableContext items={categorizedItems.uncategorized} strategy={verticalListSortingStrategy}>
+                <SortableContext items={categorizedItems.uncategorized || []} strategy={verticalListSortingStrategy}>
                   <div className="space-y-2" id="uncategorized">
-                    {categorizedItems.uncategorized.map(itemId => {
+                    {(categorizedItems.uncategorized || []).map(itemId => {
                       const item = question.items.find(i => i.id === itemId);
                       return item ? (
                         <DraggableItem key={itemId} id={itemId}>
