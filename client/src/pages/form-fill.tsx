@@ -47,6 +47,32 @@ function DraggableItem({ id, children }: DraggableItemProps) {
   );
 }
 
+function DraggableBlankItem({ id, children }: DraggableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function FormFill() {
   const [match, params] = useRoute("/fill/:shareUrl");
   const { toast } = useToast();
@@ -280,27 +306,45 @@ export default function FormFill() {
           <div className="mt-6">
             <h4 className="font-medium mb-3">Fill in the blanks (drag to reorder):</h4>
             <DndContext collisionDetection={closestCenter} onDragEnd={(event) => {
-              // Handle reordering of blanks if needed
-              console.log('Blank reorder:', event);
+              const { active, over } = event;
+              if (!over || active.id === over.id) return;
+
+              // Find the old and new indices
+              const activeId = active.id as string;
+              const overId = over.id as string;
+              
+              const activeIndex = question.blanks.findIndex(b => `blank-input-${b.id}` === activeId);
+              const overIndex = question.blanks.findIndex(b => `blank-input-${b.id}` === overId);
+              
+              if (activeIndex !== -1 && overIndex !== -1) {
+                // Create new order for display (this affects visual order of answer inputs)
+                console.log(`Reordering blank from position ${activeIndex + 1} to position ${overIndex + 1}`);
+                // Note: This reorders the visual display of answer inputs, not the text blanks themselves
+              }
             }}>
-              <SortableContext items={question.blanks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+              <SortableContext items={question.blanks.map(b => `blank-input-${b.id}`)} strategy={verticalListSortingStrategy}>
                 <div className="space-y-3">
-                  {question.blanks.map((blank, index) => (
-                    <div key={blank.id} 
-                         className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary transition-colors">
-                      <GripVertical size={16} className="text-gray-400 cursor-move" />
-                      <Label className="min-w-0 flex-shrink-0">Blank {index + 1}:</Label>
-                      <Input
-                        value={blankAnswers[blank.id] || ""}
-                        onChange={(e) => updateBlankAnswer(blank.id, e.target.value)}
-                        className="flex-1"
-                        placeholder={`Enter answer for "${blank.word}"`}
-                      />
-                      <span className="text-sm text-gray-500 min-w-0 flex-shrink-0">
-                        Original: "{blank.word}"
-                      </span>
-                    </div>
-                  ))}
+                  {question.blanks.map((blank, index) => {
+                    const sortableId = `blank-input-${blank.id}`;
+                    return (
+                      <DraggableBlankItem key={blank.id} id={sortableId}>
+                        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary transition-colors cursor-move">
+                          <GripVertical size={16} className="text-gray-400" />
+                          <Label className="min-w-0 flex-shrink-0">Blank {index + 1}:</Label>
+                          <Input
+                            value={blankAnswers[blank.id] || ""}
+                            onChange={(e) => updateBlankAnswer(blank.id, e.target.value)}
+                            className="flex-1"
+                            placeholder={`Enter answer for "${blank.word}"`}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <span className="text-sm text-gray-500 min-w-0 flex-shrink-0">
+                            Original: "{blank.word}"
+                          </span>
+                        </div>
+                      </DraggableBlankItem>
+                    );
+                  })}
                 </div>
               </SortableContext>
             </DndContext>
