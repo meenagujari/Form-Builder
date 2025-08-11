@@ -14,7 +14,9 @@ import { PreviewPanel } from "@/components/PreviewPanel";
 import { CategorizeQuestion } from "@/components/question-types/CategorizeQuestion";
 import { ClozeQuestion } from "@/components/question-types/ClozeQuestion";
 import { ComprehensionQuestion } from "@/components/question-types/ComprehensionQuestion";
-import { Box, Edit, Eye, BarChart3, Share, Save, Plus, Settings, Trash2, Copy, FileText } from "lucide-react";
+import { ObjectUploader } from "@/components/ObjectUploader";
+import { Box, Edit, Eye, BarChart3, Share, Save, Plus, Settings, Trash2, Copy, FileText, Image } from "lucide-react";
+import type { UploadResult } from "@uppy/core";
 
 export default function FormBuilder() {
   const [match, params] = useRoute("/builder/:id");
@@ -297,6 +299,52 @@ export default function FormBuilder() {
                     className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                     rows={3}
                   />
+                </div>
+                
+                {/* Header Image Upload */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Header Image</Label>
+                  <div className="mt-1 space-y-2">
+                    {formData.headerImage ? (
+                      <div className="relative">
+                        <img 
+                          src={formData.headerImage} 
+                          alt="Header" 
+                          className="w-full h-24 object-cover rounded-lg border"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setFormData({ ...formData, headerImage: "" })}
+                          className="absolute top-1 right-1 h-6 w-6 p-0 bg-red-500 text-white hover:bg-red-600"
+                        >
+                          <Trash2 size={12} />
+                        </Button>
+                      </div>
+                    ) : (
+                      <ObjectUploader
+                        maxNumberOfFiles={1}
+                        maxFileSize={5 * 1024 * 1024} // 5MB
+                        onGetUploadParameters={async () => {
+                          const response = await fetch("/api/objects/upload", { method: "POST" });
+                          const data = await response.json();
+                          return { method: "PUT" as const, url: data.uploadURL };
+                        }}
+                        onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                          if (result.successful.length > 0) {
+                            const uploadURL = result.successful[0].uploadURL;
+                            setFormData({ ...formData, headerImage: uploadURL });
+                          }
+                        }}
+                        buttonClassName="w-full"
+                      >
+                        <div className="flex items-center justify-center">
+                          <Image size={16} className="mr-2" />
+                          Upload Header Image
+                        </div>
+                      </ObjectUploader>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

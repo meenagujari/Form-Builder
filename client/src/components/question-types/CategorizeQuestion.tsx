@@ -23,11 +23,10 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-// Image upload temporarily disabled
-// import { ObjectUploader } from "../ObjectUploader";
-// import { apiRequest } from "@/lib/queryClient";
+import { ObjectUploader } from "@/components/ObjectUploader";
 import { CategorizeQuestion as CategorizeQuestionType } from "@shared/schema";
 import { LayersIcon, Settings, Plus, Trash2, Image } from "lucide-react";
+import type { UploadResult } from "@uppy/core";
 
 // Sortable Item Component
 function SortableItem({ id, children }: { id: string; children: React.ReactNode }) {
@@ -344,13 +343,49 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
           </div>
         </div>
 
-        {/* Image upload temporarily disabled due to storage configuration */}
-        {/* <div className="mt-6 pt-4 border-t border-gray-200">
-          <Button variant="outline" className="bg-gray-100 hover:bg-gray-200 text-gray-700">
-            <Image size={16} className="mr-2" />
-            Add Image (Coming Soon)
-          </Button>
-        </div> */}
+        {/* Image Upload Section */}
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <h4 className="text-sm font-medium text-gray-700 mb-3">Question Image</h4>
+          {question.image ? (
+            <div className="relative mb-4">
+              <img 
+                src={question.image} 
+                alt="Question" 
+                className="w-full max-w-md h-32 object-cover rounded-lg border"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onUpdate({ image: "" })}
+                className="absolute top-2 right-2 h-6 w-6 p-0 bg-red-500 text-white hover:bg-red-600"
+              >
+                <Trash2 size={12} />
+              </Button>
+            </div>
+          ) : (
+            <ObjectUploader
+              maxNumberOfFiles={1}
+              maxFileSize={5 * 1024 * 1024} // 5MB
+              onGetUploadParameters={async () => {
+                const response = await fetch("/api/objects/upload", { method: "POST" });
+                const data = await response.json();
+                return { method: "PUT" as const, url: data.uploadURL };
+              }}
+              onComplete={(result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+                if (result.successful && result.successful.length > 0) {
+                  const uploadURL = result.successful[0].uploadURL;
+                  onUpdate({ image: uploadURL });
+                }
+              }}
+              buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
+            >
+              <div className="flex items-center">
+                <Image size={16} className="mr-2" />
+                Add Image
+              </div>
+            </ObjectUploader>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
