@@ -4,11 +4,88 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 // Image upload temporarily disabled
 // import { ObjectUploader } from "../ObjectUploader";
 // import { apiRequest } from "@/lib/queryClient";
 import { CategorizeQuestion as CategorizeQuestionType } from "@shared/schema";
-import { LayersIcon, Settings, Plus, Trash2, Image } from "lucide-react";
+import { LayersIcon, Settings, Plus, Trash2, Image, GripVertical } from "lucide-react";
+
+// Sortable Item Component
+function SortableItem({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="flex items-center">
+        <div {...listeners} className="cursor-grab active:cursor-grabbing p-1 mr-2">
+          <GripVertical size={16} className="text-gray-400" />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Sortable Category Component  
+function SortableCategory({ id, children }: { id: string; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div className="flex items-center">
+        <div {...listeners} className="cursor-grab active:cursor-grabbing p-1 mr-2">
+          <GripVertical size={16} className="text-gray-400" />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 interface CategorizeQuestionProps {
   question: CategorizeQuestionType;
@@ -19,6 +96,13 @@ interface CategorizeQuestionProps {
 export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQuestionProps) {
   const [newItemText, setNewItemText] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Image upload handlers temporarily disabled
   // const handleGetUploadParameters = async () => {
@@ -99,6 +183,32 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
     });
   };
 
+  const handleItemDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = question.items.findIndex(item => item.id === active.id);
+      const newIndex = question.items.findIndex(item => item.id === over.id);
+
+      onUpdate({
+        items: arrayMove(question.items, oldIndex, newIndex),
+      });
+    }
+  };
+
+  const handleCategoryDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = question.categories.findIndex(cat => cat.id === active.id);
+      const newIndex = question.categories.findIndex(cat => cat.id === over.id);
+
+      onUpdate({
+        categories: arrayMove(question.categories, oldIndex, newIndex),
+      });
+    }
+  };
+
   return (
     <Card className="mb-6">
       <CardContent className="p-6">
@@ -132,41 +242,57 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Items to Categorize */}
+          {/* Items to Categorize - Drag & Drop Enabled */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Items to Categorize</h4>
-            <div className="space-y-2 mb-4">
-              {question.items.map(item => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                  <Input
-                    value={item.text}
-                    onChange={(e) => updateItem(item.id, { text: e.target.value })}
-                    className="border-none bg-transparent p-0 h-auto"
-                    placeholder="Item text"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <Select
-                      value={item.correctCategory}
-                      onValueChange={(value) => updateItem(item.id, { correctCategory: value })}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue placeholder="Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {question.categories.map(category => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button variant="ghost" size="sm" onClick={() => deleteItem(item.id)}>
-                      <Trash2 size={16} className="text-red-500" />
-                    </Button>
-                  </div>
+            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+              <GripVertical size={16} className="mr-2 text-gray-400" />
+              Items to Categorize (Drag to reorder)
+            </h4>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleItemDragEnd}
+            >
+              <SortableContext 
+                items={question.items.map(item => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 mb-4">
+                  {question.items.map(item => (
+                    <SortableItem key={item.id} id={item.id}>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex-1">
+                        <Input
+                          value={item.text}
+                          onChange={(e) => updateItem(item.id, { text: e.target.value })}
+                          className="border-none bg-transparent p-0 h-auto"
+                          placeholder="Item text"
+                        />
+                        <div className="flex items-center space-x-2">
+                          <Select
+                            value={item.correctCategory}
+                            onValueChange={(value) => updateItem(item.id, { correctCategory: value })}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue placeholder="Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {question.categories.map(category => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button variant="ghost" size="sm" onClick={() => deleteItem(item.id)}>
+                            <Trash2 size={16} className="text-red-500" />
+                          </Button>
+                        </div>
+                      </div>
+                    </SortableItem>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
             
             <div className="flex space-x-2">
               <Input
@@ -181,24 +307,40 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
             </div>
           </div>
 
-          {/* Categories */}
+          {/* Categories - Drag & Drop Enabled */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Categories</h4>
-            <div className="space-y-2 mb-4">
-              {question.categories.map(category => (
-                <div key={category.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <Input
-                    value={category.name}
-                    onChange={(e) => updateCategory(category.id, e.target.value)}
-                    className="border-none bg-transparent p-0 h-auto font-medium text-blue-900"
-                    placeholder="Category name"
-                  />
-                  <Button variant="ghost" size="sm" onClick={() => deleteCategory(category.id)}>
-                    <Trash2 size={16} className="text-red-500" />
-                  </Button>
+            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+              <GripVertical size={16} className="mr-2 text-gray-400" />
+              Categories (Drag to reorder)
+            </h4>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleCategoryDragEnd}
+            >
+              <SortableContext 
+                items={question.categories.map(cat => cat.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 mb-4">
+                  {question.categories.map(category => (
+                    <SortableCategory key={category.id} id={category.id}>
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200 flex-1">
+                        <Input
+                          value={category.name}
+                          onChange={(e) => updateCategory(category.id, e.target.value)}
+                          className="border-none bg-transparent p-0 h-auto font-medium text-blue-900"
+                          placeholder="Category name"
+                        />
+                        <Button variant="ghost" size="sm" onClick={() => deleteCategory(category.id)}>
+                          <Trash2 size={16} className="text-red-500" />
+                        </Button>
+                      </div>
+                    </SortableCategory>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
             
             <div className="flex space-x-2">
               <Input
