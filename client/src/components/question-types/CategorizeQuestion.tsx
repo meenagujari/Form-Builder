@@ -232,6 +232,53 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Categories - Drag & Drop Enabled */}
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 mb-3">
+              Categories
+            </h4>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleCategoryDragEnd}
+            >
+              <SortableContext 
+                items={question.categories.map(cat => cat.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2 mb-4">
+                  {question.categories.map(category => (
+                    <SortableCategory key={category.id} id={category.id}>
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200 flex-1">
+                        <Input
+                          value={category.name}
+                          onChange={(e) => updateCategory(category.id, e.target.value)}
+                          className="border-none bg-transparent p-0 h-auto font-medium text-blue-900"
+                          placeholder="Category name"
+                        />
+                        <Button variant="ghost" size="sm" onClick={() => deleteCategory(category.id)}>
+                          <Trash2 size={16} className="text-red-500" />
+                        </Button>
+                      </div>
+                    </SortableCategory>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+            
+            <div className="flex space-x-2">
+              <Input
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Add new category..."
+                onKeyPress={(e) => e.key === "Enter" && addCategory()}
+              />
+              <Button onClick={addCategory} variant="outline">
+                <Plus size={16} />
+              </Button>
+            </div>
+          </div>
+
           {/* Items to Categorize - Drag & Drop Enabled */}
           <div>
             <h4 className="text-sm font-medium text-gray-700 mb-3">
@@ -291,53 +338,6 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
                 onKeyPress={(e) => e.key === "Enter" && addItem()}
               />
               <Button onClick={addItem} variant="outline">
-                <Plus size={16} />
-              </Button>
-            </div>
-          </div>
-
-          {/* Categories - Drag & Drop Enabled */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-3">
-              Categories
-            </h4>
-            <DndContext 
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleCategoryDragEnd}
-            >
-              <SortableContext 
-                items={question.categories.map(cat => cat.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-2 mb-4">
-                  {question.categories.map(category => (
-                    <SortableCategory key={category.id} id={category.id}>
-                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200 flex-1">
-                        <Input
-                          value={category.name}
-                          onChange={(e) => updateCategory(category.id, e.target.value)}
-                          className="border-none bg-transparent p-0 h-auto font-medium text-blue-900"
-                          placeholder="Category name"
-                        />
-                        <Button variant="ghost" size="sm" onClick={() => deleteCategory(category.id)}>
-                          <Trash2 size={16} className="text-red-500" />
-                        </Button>
-                      </div>
-                    </SortableCategory>
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-            
-            <div className="flex space-x-2">
-              <Input
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="Add new category..."
-                onKeyPress={(e) => e.key === "Enter" && addCategory()}
-              />
-              <Button onClick={addCategory} variant="outline">
                 <Plus size={16} />
               </Button>
             </div>
