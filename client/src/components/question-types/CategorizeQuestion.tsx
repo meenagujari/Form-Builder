@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ObjectUploader } from "../ObjectUploader";
-import { apiRequest } from "@/lib/queryClient";
+// Image upload temporarily disabled
+// import { ObjectUploader } from "../ObjectUploader";
+// import { apiRequest } from "@/lib/queryClient";
 import { CategorizeQuestion as CategorizeQuestionType } from "@shared/schema";
 import { LayersIcon, Settings, Plus, Trash2, Image } from "lucide-react";
 
@@ -19,21 +20,22 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
   const [newItemText, setNewItemText] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
 
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest("POST", "/api/objects/upload");
-    const data = await response.json();
-    return {
-      method: "PUT" as const,
-      url: data.uploadURL,
-    };
-  };
+  // Image upload handlers temporarily disabled
+  // const handleGetUploadParameters = async () => {
+  //   const response = await apiRequest("POST", "/api/objects/upload");
+  //   const data = await response.json();
+  //   return {
+  //     method: "PUT" as const,
+  //     url: data.uploadURL,
+  //   };
+  // };
 
-  const handleUploadComplete = (result: any) => {
-    if (result.successful && result.successful[0]) {
-      const uploadedUrl = result.successful[0].uploadURL;
-      onUpdate({ image: uploadedUrl });
-    }
-  };
+  // const handleUploadComplete = (result: any) => {
+  //   if (result.successful && result.successful[0]) {
+  //     const uploadedUrl = result.successful[0].uploadURL;
+  //     onUpdate({ image: uploadedUrl });
+  //   }
+  // };
 
   const addItem = () => {
     if (!newItemText.trim()) return;
@@ -212,24 +214,13 @@ export function CategorizeQuestion({ question, onUpdate, onDelete }: CategorizeQ
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <ObjectUploader
-            maxNumberOfFiles={1}
-            maxFileSize={10485760}
-            onGetUploadParameters={handleGetUploadParameters}
-            onComplete={handleUploadComplete}
-            buttonClassName="bg-gray-100 hover:bg-gray-200 text-gray-700"
-          >
+        {/* Image upload temporarily disabled due to storage configuration */}
+        {/* <div className="mt-6 pt-4 border-t border-gray-200">
+          <Button variant="outline" className="bg-gray-100 hover:bg-gray-200 text-gray-700">
             <Image size={16} className="mr-2" />
-            {question.image ? "Change Image" : "Add Image"}
-          </ObjectUploader>
-          
-          {question.image && (
-            <div className="mt-4">
-              <img src={question.image} alt="Question" className="max-w-xs rounded border" />
-            </div>
-          )}
-        </div>
+            Add Image (Coming Soon)
+          </Button>
+        </div> */}
       </CardContent>
     </Card>
   );
