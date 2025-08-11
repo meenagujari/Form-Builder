@@ -202,28 +202,6 @@ export default function FormFill() {
           
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <div className="space-y-6">
-              {/* Items to Categorize */}
-              <div>
-                <h4 className="font-medium mb-3">Items to Categorize</h4>
-                <DroppableCategory id="uncategorized">
-                  <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
-                    <div className="flex flex-wrap gap-2">
-                      {(categorizedItems.uncategorized || []).map((itemId: string) => {
-                        const item = question.items.find(i => i.id === itemId);
-                        return item ? (
-                          <DraggableItem key={itemId} id={itemId}>
-                            {item.text}
-                          </DraggableItem>
-                        ) : null;
-                      })}
-                      {(categorizedItems.uncategorized || []).length === 0 && (
-                        <p className="text-gray-500 text-center py-4 w-full">Drop items here to uncategorize them</p>
-                      )}
-                    </div>
-                  </div>
-                </DroppableCategory>
-              </div>
-
               {/* Categories */}
               <div>
                 <h4 className="font-medium mb-3">Categories</h4>
@@ -249,6 +227,28 @@ export default function FormFill() {
                     </DroppableCategory>
                   ))}
                 </div>
+              </div>
+
+              {/* Items to Categorize */}
+              <div>
+                <h4 className="font-medium mb-3">Items to Categorize</h4>
+                <DroppableCategory id="uncategorized">
+                  <div className="min-h-20 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                    <div className="flex flex-wrap gap-2">
+                      {(categorizedItems.uncategorized || []).map((itemId: string) => {
+                        const item = question.items.find(i => i.id === itemId);
+                        return item ? (
+                          <DraggableItem key={itemId} id={itemId}>
+                            {item.text}
+                          </DraggableItem>
+                        ) : null;
+                      })}
+                      {(categorizedItems.uncategorized || []).length === 0 && (
+                        <p className="text-gray-500 text-center py-4 w-full">Drop items here to uncategorize them</p>
+                      )}
+                    </div>
+                  </div>
+                </DroppableCategory>
               </div>
             </div>
           </DndContext>
