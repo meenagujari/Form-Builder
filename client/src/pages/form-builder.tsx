@@ -254,16 +254,7 @@ export default function FormBuilder() {
               <div className="text-sm text-gray-500 hidden sm:block">
                 {formData.questions.length} question{formData.questions.length !== 1 ? 's' : ''}
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={handleSave}
-                disabled={createFormMutation.isPending || updateFormMutation.isPending}
-                className="hover:bg-gray-100"
-              >
-                <Save size={16} className="mr-2" />
-                Save Draft
-              </Button>
+
               <Button 
                 onClick={handlePublish}
                 disabled={createFormMutation.isPending || updateFormMutation.isPending}
