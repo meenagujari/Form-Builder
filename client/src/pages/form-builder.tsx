@@ -269,8 +269,12 @@ export default function FormBuilder() {
             
             <div className="space-y-4">
               <div 
-                onClick={() => addQuestion("categorize")}
+                onClick={() => {
+                  console.log("Adding categorize question");
+                  addQuestion("categorize");
+                }}
                 className="sidebar-item"
+                style={{ cursor: 'pointer' }}
               >
                 <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                   <Box size={20} />
@@ -282,8 +286,12 @@ export default function FormBuilder() {
               </div>
               
               <div 
-                onClick={() => addQuestion("cloze")}
+                onClick={() => {
+                  console.log("Adding cloze question");
+                  addQuestion("cloze");
+                }}
                 className="sidebar-item"
+                style={{ cursor: 'pointer' }}
               >
                 <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
                   <Edit size={20} />
@@ -295,8 +303,12 @@ export default function FormBuilder() {
               </div>
               
               <div 
-                onClick={() => addQuestion("comprehension")}
+                onClick={() => {
+                  console.log("Adding comprehension question");
+                  addQuestion("comprehension");
+                }}
                 className="sidebar-item"
+                style={{ cursor: 'pointer' }}
               >
                 <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                   <FileText size={20} />
