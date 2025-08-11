@@ -73,6 +73,38 @@ function DraggableAnswerOption({ id, children }: DraggableItemProps) {
   );
 }
 
+function DraggableMCQOption({ id, children }: DraggableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${isDragging ? 'z-50' : ''}`}
+    >
+      <div className="flex items-center space-x-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing">
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+          <GripVertical size={16} className="text-gray-400" />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function DroppableBlank({ id, children, isOver }: { id: string; children: React.ReactNode; isOver: boolean }) {
   const { setNodeRef } = useDroppable({ id });
 
@@ -532,15 +564,12 @@ export default function FormFill() {
                       className="space-y-2"
                     >
                       {getOrderedOptions(mcq).map((option: any) => (
-                        <DraggableAnswerOption key={option.id} id={option.id}>
-                          <div className="flex items-center space-x-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                            <GripVertical size={16} className="text-gray-400 cursor-grab" />
-                            <RadioGroupItem value={option.id} id={option.id} />
-                            <Label htmlFor={option.id} className="cursor-pointer flex-1">
-                              {option.text}
-                            </Label>
-                          </div>
-                        </DraggableAnswerOption>
+                        <DraggableMCQOption key={option.id} id={option.id}>
+                          <RadioGroupItem value={option.id} id={option.id} />
+                          <Label htmlFor={option.id} className="cursor-pointer flex-1">
+                            {option.text}
+                          </Label>
+                        </DraggableMCQOption>
                       ))}
                     </RadioGroup>
                   </SortableContext>
