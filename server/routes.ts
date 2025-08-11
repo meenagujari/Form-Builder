@@ -141,7 +141,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const responseData = {
         formId: req.params.id,
         answers: req.body.answers,
-        userEmail: req.body.userEmail,
       };
 
       const validatedData = insertResponseSchema.parse(responseData);

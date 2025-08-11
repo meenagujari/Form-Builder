@@ -26,7 +26,6 @@ export const responses = pgTable("responses", {
   formId: varchar("form_id").notNull().references(() => forms.id, { onDelete: "cascade" }),
   answers: jsonb("answers").notNull(),
   submittedAt: timestamp("submitted_at").notNull().default(sql`now()`),
-  userEmail: text("user_email"),
 });
 
 // Question type schemas

@@ -95,7 +95,6 @@ export default function FormFill() {
   const shareUrl = params?.shareUrl;
 
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [userEmail, setUserEmail] = useState("");
 
   const { data: form, isLoading, error } = useQuery({
     queryKey: ["/api/share", shareUrl],
@@ -103,7 +102,7 @@ export default function FormFill() {
   });
 
   const submitMutation = useMutation({
-    mutationFn: async (data: { answers: Record<string, any>; userEmail?: string }) => {
+    mutationFn: async (data: { answers: Record<string, any> }) => {
       const response = await apiRequest("POST", `/api/forms/${(form as Form).id}/responses`, data);
       return response.json();
     },
@@ -113,7 +112,6 @@ export default function FormFill() {
         description: "Thank you for completing the form.",
       });
       setAnswers({});
-      setUserEmail("");
     },
     onError: () => {
       toast({
@@ -125,7 +123,7 @@ export default function FormFill() {
   });
 
   const handleSubmit = () => {
-    submitMutation.mutate({ answers, userEmail });
+    submitMutation.mutate({ answers });
   };
 
   const updateAnswer = (questionId: string, answer: any) => {

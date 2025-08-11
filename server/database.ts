@@ -56,7 +56,6 @@ const ResponseSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
   formId: { type: String, required: true },
   answers: { type: mongoose.Schema.Types.Mixed, required: true },
-  userEmail: { type: String, default: null },
   submittedAt: { type: Date, default: Date.now }
 });
 

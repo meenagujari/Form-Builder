@@ -138,7 +138,6 @@ export class MongoStorage implements IStorage {
       const id = randomUUID();
       const responseData = {
         ...insertResponse,
-        userEmail: insertResponse.userEmail ?? null,
         id,
         submittedAt: new Date(),
       };
@@ -182,7 +181,6 @@ export class MongoStorage implements IStorage {
       id: mongoResponse.id,
       formId: mongoResponse.formId,
       answers: mongoResponse.answers,
-      userEmail: mongoResponse.userEmail,
       submittedAt: mongoResponse.submittedAt
     };
   }
@@ -276,7 +274,6 @@ try {
       const id = randomUUID();
       const response: Response = {
         ...insertResponse,
-        userEmail: insertResponse.userEmail ?? null,
         id,
         submittedAt: new Date(),
       };
