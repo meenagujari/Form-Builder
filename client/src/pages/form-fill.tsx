@@ -73,37 +73,7 @@ function DraggableAnswerOption({ id, children }: DraggableItemProps) {
   );
 }
 
-function DraggableMCQOption({ id, children }: DraggableItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`${isDragging ? 'z-50' : ''}`}
-    >
-      <div className="flex items-center space-x-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-grab active:cursor-grabbing">
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
-          <GripVertical size={16} className="text-gray-400" />
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-}
 
 function DroppableBlank({ id, children, isOver }: { id: string; children: React.ReactNode; isOver: boolean }) {
   const { setNodeRef } = useDroppable({ id });
@@ -479,57 +449,18 @@ export default function FormFill() {
     if (!answers[question.id]) {
       setAnswers(prev => ({
         ...prev,
-        [question.id]: { mcqAnswers: {}, optionOrders: {} }
+        [question.id]: {}
       }));
     }
 
-    const questionAnswers = answers[question.id] || { mcqAnswers: {}, optionOrders: {} };
-    const mcqAnswers = questionAnswers.mcqAnswers || {};
-    const optionOrders = questionAnswers.optionOrders || {};
+    const mcqAnswers = answers[question.id] || {};
 
     const updateMcqAnswer = (mcqId: string, optionId: string) => {
-      const newMcqAnswers = { ...mcqAnswers, [mcqId]: optionId };
+      const newAnswers = { ...mcqAnswers, [mcqId]: optionId };
       setAnswers(prev => ({
         ...prev,
-        [question.id]: {
-          ...questionAnswers,
-          mcqAnswers: newMcqAnswers
-        }
+        [question.id]: newAnswers
       }));
-    };
-
-    const handleDragEnd = (event: DragEndEvent, mcqId: string) => {
-      const { active, over } = event;
-      if (!over || active.id === over.id) return;
-
-      const mcq = question.questions.find(q => q.id === mcqId);
-      if (!mcq) return;
-
-      const currentOrder = optionOrders[mcqId] || mcq.options.map(opt => opt.id);
-      const activeIndex = currentOrder.indexOf(active.id as string);
-      const overIndex = currentOrder.indexOf(over.id as string);
-
-      if (activeIndex !== -1 && overIndex !== -1) {
-        const newOrder = [...currentOrder];
-        const [removed] = newOrder.splice(activeIndex, 1);
-        newOrder.splice(overIndex, 0, removed);
-
-        setAnswers(prev => ({
-          ...prev,
-          [question.id]: {
-            ...questionAnswers,
-            optionOrders: {
-              ...optionOrders,
-              [mcqId]: newOrder
-            }
-          }
-        }));
-      }
-    };
-
-    const getOrderedOptions = (mcq: any) => {
-      const order = optionOrders[mcq.id] || mcq.options.map((opt: any) => opt.id);
-      return order.map((optionId: string) => mcq.options.find((opt: any) => opt.id === optionId)).filter(Boolean);
     };
 
     return (
@@ -548,32 +479,20 @@ export default function FormFill() {
             {question.questions.map((mcq, index) => (
               <div key={mcq.id} className="border border-gray-200 rounded-lg p-4">
                 <h4 className="font-medium mb-3">Question {index + 1}: {mcq.question}</h4>
-                <p className="text-sm text-gray-600 mb-3">Drag to reorder the options:</p>
-                
-                <DndContext 
-                  collisionDetection={closestCenter} 
-                  onDragEnd={(event) => handleDragEnd(event, mcq.id)}
+                <RadioGroup
+                  value={mcqAnswers[mcq.id] || ""}
+                  onValueChange={(value) => updateMcqAnswer(mcq.id, value)}
+                  className="space-y-2"
                 >
-                  <SortableContext 
-                    items={getOrderedOptions(mcq).map((opt: any) => opt.id)} 
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <RadioGroup
-                      value={mcqAnswers[mcq.id] || ""}
-                      onValueChange={(value) => updateMcqAnswer(mcq.id, value)}
-                      className="space-y-2"
-                    >
-                      {getOrderedOptions(mcq).map((option: any) => (
-                        <DraggableMCQOption key={option.id} id={option.id}>
-                          <RadioGroupItem value={option.id} id={option.id} />
-                          <Label htmlFor={option.id} className="cursor-pointer flex-1">
-                            {option.text}
-                          </Label>
-                        </DraggableMCQOption>
-                      ))}
-                    </RadioGroup>
-                  </SortableContext>
-                </DndContext>
+                  {mcq.options.map(option => (
+                    <div key={option.id} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option.id} id={option.id} />
+                      <Label htmlFor={option.id} className="cursor-pointer">
+                        {option.text}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
             ))}
           </div>
