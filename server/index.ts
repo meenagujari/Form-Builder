@@ -45,6 +45,7 @@ app.use((req, res, next) => {
   } catch (error: any) {
     log("MongoDB connection failed - using in-memory storage fallback");
     console.error("MongoDB connection error:", error.message);
+    console.error("Stack:", error.stack);
     // Continue with in-memory storage - don't exit
   }
 
@@ -54,8 +55,15 @@ app.use((req, res, next) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    console.error("Error occurred:", {
+      message: err.message,
+      stack: err.stack,
+      status,
+      url: _req.url,
+      method: _req.method
+    });
+
     res.status(status).json({ message });
-    throw err;
   });
 
   // importantly only setup vite in development and after
