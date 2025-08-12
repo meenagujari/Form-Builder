@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -105,6 +105,7 @@ export default function FormFill() {
   const [match, params] = useRoute("/fill/:shareUrl");
   const { toast } = useToast();
   const shareUrl = params?.shareUrl;
+  const [, navigate] = useLocation(); // Initialize useLocation for navigation
 
   const [answers, setAnswers] = useState<Record<string, any>>({});
 
@@ -124,6 +125,7 @@ export default function FormFill() {
         description: "Thank you for completing the form.",
       });
       setAnswers({});
+      navigate('/builder'); // Redirect to the builder page
     },
     onError: () => {
       toast({
